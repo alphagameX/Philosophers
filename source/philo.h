@@ -18,6 +18,9 @@ typedef struct s_philo
 {
 	int id;
 	int is_alive;
+	int have_eat;
+
+	t_conf conf;
 	pthread_mutex_t *forks;
 } t_philo;
 
@@ -32,7 +35,7 @@ typedef struct s_stack
 
 t_conf			init_conf(int argc, char **argv);
 pthread_mutex_t	*init_forks(int fork_count);
-t_philo			*init_philo(int id, t_stack *stack);
+t_philo			*init_philo(int id, t_stack *stack, t_conf conf);
 void exit_philo(char *msg);
 
 /*

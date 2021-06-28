@@ -37,16 +37,32 @@ void *philo_forum(void *args)
 
 	philo = (t_philo *)args;
 	forks = (pthread_mutex_t *)philo->forks;
-	while (philo->is_alive) 
+	while (philo->is_alive)
 	{
-		pthread_mutex_lock(&forks[0]);
-		philo->is_alive = 0;
-		pthread_mutex_unlock(&forks[0]);
+		pthread_mutex_lock(&forks[philo->id]);
+		if(philo->id < philo->conf.number_of_philo - 1)
+			pthread_mutex_lock(&forks[philo->id + 1]);
+		else
+			pthread_mutex_lock(&forks[0]);
+
+		printf("Philo eat | id: %d\n", philo->id);
+		philo->have_eat ++;
+		usleep(philo->conf.time_to_eat);
+
+		if (philo->conf.number_of_times_each_philo_eat != -1 && philo->have_eat >= philo->conf.number_of_times_each_philo_eat)
+		{
+			printf("Philo died | id: %d\n", philo->id);
+			philo->is_alive = 0;
+		}
+		if (philo->id < philo->conf.number_of_philo - 1)
+			pthread_mutex_unlock(&forks[philo->id + 1]);
+		else
+			pthread_mutex_unlock(&forks[0]);
+		pthread_mutex_unlock(&forks[philo->id]);
+		printf("Philo sleeping | id: %d\n", philo->id);
+		usleep(philo->conf.time_to_sleep);
+		printf("Philo thinking | id: %d\n", philo->id);
 	}
-	// pthread_mutex_lock()
-
-	printf("Philo id %d!\n", philo->id);
-
 	return (NULL);
 }
 
@@ -63,7 +79,7 @@ void create_philo(t_conf conf, t_stack *stack)
 		exit_philo("Error malloc");
 	while (i < conf.number_of_philo)
 	{
-		stack->philos[i] = init_philo(i, stack);
+		stack->philos[i] = init_philo(i, stack, conf);
 		err = pthread_create(&stack->tid[i], NULL, philo_forum, (void *)stack->philos[i]);
 		if(err == -1)
 			exit_philo("Error pthread create");

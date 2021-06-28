@@ -28,6 +28,8 @@ t_conf init_conf(int argc, char **argv)
 					new.time_to_sleep = res;
 				if (i == 5)
 					new.number_of_times_each_philo_eat = res;
+				else
+					new.number_of_times_each_philo_eat = -1;
 			}
 			else
 				exit_philo("One parameter is negative");
@@ -56,7 +58,7 @@ pthread_mutex_t *init_forks(int fork_count)
 	return (forks);
 }
 
-t_philo *init_philo(int id, t_stack *stack)
+t_philo *init_philo(int id, t_stack *stack, t_conf conf)
 {
 	t_philo *philo;
 
@@ -65,6 +67,8 @@ t_philo *init_philo(int id, t_stack *stack)
 		exit_philo("Error malloc");
 	philo->id = id;
 	philo->is_alive = 1;
+	philo->have_eat = 0;
+	philo->conf = conf;
 	philo->forks = (void *)stack->forks;
 	return (philo);
 }
