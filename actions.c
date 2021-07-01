@@ -36,7 +36,7 @@ void eat(t_philo *philo, pthread_mutex_t *forks)
 {
 	(void)forks;
 	philo->have_eat++;
-	philo->last_meal = elapsed_time(philo->conf->elapsed);
+	philo->last_meal = utc_time_in_usec(now());
 	mutex_printer(philo, "is eating\n", elapsed_time(philo->conf->elapsed), philo->id);
 	sleep_time(philo->conf->time_to_eat);
 }

@@ -5,16 +5,17 @@ void *god_philo(void *args)
 	t_philo *philo;
 
 	philo = (t_philo *)args;
-	while(philo->is_alive && philo->conf->running)
+	while (philo->is_alive && philo->conf->running)
 	{
-		// if (elapsed_time(philo->conf->elapsed) - philo->last_meal > philo->conf->time_to_die && philo->last_meal != 0)
-		// {
-		// 	philo->is_alive = 0;
-		// 	mutex_printer(philo, "died\n", elapsed_time(philo->conf->elapsed), philo->id);
-		// 	philo->conf->running = 0;
-		// }
+		if (utc_time_in_usec(now()) - philo->last_meal > philo->conf->time_to_die && philo->last_meal != 0)
+		{
+			philo->is_alive = 0;
+			mutex_printer(philo, "died\n", elapsed_time(philo->conf->elapsed) - 1, philo->id);
+			philo->conf->running = 0;
+			break ;
+		}
+		usleep(10);
 	}
-
 	return (NULL);
 }
 
@@ -47,7 +48,7 @@ void *philo_forum(void *args)
 			philo->conf->philo_dead++;
 		}
 		drop_forks(philo, forks);
-		if (philo->is_alive)
+		if (philo->is_alive && philo->conf->running)
 		{
 			mutex_printer(philo, "is sleeping\n", elapsed_time(philo->conf->elapsed), philo->id);
 			sleep_time(philo->conf->time_to_sleep);
@@ -57,22 +58,25 @@ void *philo_forum(void *args)
 	return (NULL);
 }
 
-pthread_mutex_t *init_printer()
+pthread_mutex_t	*init_printer(void)
 {
-	pthread_mutex_t *printer;
+	pthread_mutex_t	*printer;
 
 	printer = new (sizeof(pthread_mutex_t), 1);
 	if (!printer)
+	{
+		destroy_stack();
 		exit(1);
+	}
 	pthread_mutex_init(printer, NULL);
 	return (printer);
 }
 
-void create_philo(t_conf *conf, t_stack *stack)
+void	create_philo(t_conf *conf, t_stack *stack)
 {
-	int i;
-	int err;
-	pthread_mutex_t *printer;
+	int				i;
+	int				err;
+	pthread_mutex_t	*printer;
 
 	err = 0;
 	i = 0;
@@ -93,7 +97,7 @@ void create_philo(t_conf *conf, t_stack *stack)
 			destroy_stack();
 			exit(1);
 		}
-		sleep_time(100);
+		usleep(10);
 		i++;
 	}
 	while (err < i)
@@ -103,10 +107,10 @@ void create_philo(t_conf *conf, t_stack *stack)
 	}
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_conf conf;
-	t_stack stack;
+	t_conf	conf;
+	t_stack	stack;
 
 	conf = init_conf(argc, argv);
 	stack.forks = init_forks(conf.number_of_philo);
