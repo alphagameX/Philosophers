@@ -1,6 +1,7 @@
 NAME= philo
-FILE= $(wildcard *.c) \
-	  $(wildcard utils/*.c)
+FILE= $(wildcard utils/*.c) \
+	  $(wildcard utils/mem/*.c) \
+	  $(wildcard *.c) 
 FLAGS= -Wall -Werror -Wextra
 LIB= -lpthread
 

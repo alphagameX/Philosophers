@@ -1,5 +1,13 @@
 #include "source/philo.h"
 
+void fail_parse(char *msg)
+{
+	printf("Error\n");
+	printf("%s\n", msg);
+	destroy_stack();
+	exit(1);
+}
+
 t_conf init_conf(int argc, char **argv)
 {
 	t_conf new;
@@ -7,9 +15,9 @@ t_conf init_conf(int argc, char **argv)
 	int res;
 
 	if (argc < 5)
-		exit_philo("Invalid args number");
+		fail_parse("Invalid args number");
 	if (argc > 6)
-		exit_philo("Too many args number");
+		fail_parse("Too many args number");
 	i = 1;
 	while (i < argc)
 	{
@@ -21,23 +29,26 @@ t_conf init_conf(int argc, char **argv)
 				if (i == 1)
 					new.number_of_philo = res;
 				if (i == 2)
-					new.time_to_die = res;
+					new.time_to_die = res * 1000;
 				if (i == 3)
-					new.time_to_eat = res;
+					new.time_to_eat = res * 1000;
 				if (i == 4)
-					new.time_to_sleep = res;
+					new.time_to_sleep = res * 1000;
 				if (i == 5)
 					new.number_of_times_each_philo_eat = res;
 				else
 					new.number_of_times_each_philo_eat = -1;
 			}
 			else
-				exit_philo("One parameter is negative");
+				fail_parse("One parameter is negative");
 		}
 		else
-			exit_philo("One parameter is not a number");
+			fail_parse("One parameter is not a number");
 		i++;
 	}
+	gettimeofday(&new.elapsed, NULL);
+	new.philo_dead = 0;
+	new.running = 1;
 	return (new);
 }
 
@@ -46,9 +57,12 @@ pthread_mutex_t *init_forks(int fork_count)
 	int i;
 	pthread_mutex_t *forks;
 
-	forks = malloc(sizeof(pthread_mutex_t) * fork_count);
+	forks = new(sizeof(pthread_mutex_t), fork_count);
 	if (!forks)
-		exit_philo("Error malloc");
+	{
+		destroy_stack();
+		exit(1);
+	}
 	i = 0;
 	while (i < fork_count)
 	{
@@ -58,17 +72,22 @@ pthread_mutex_t *init_forks(int fork_count)
 	return (forks);
 }
 
-t_philo *init_philo(int id, t_stack *stack, t_conf conf)
+t_philo *init_philo(int id, t_stack *stack, t_conf *conf, pthread_mutex_t *printer)
 {
 	t_philo *philo;
 
-	philo = malloc(sizeof(t_philo) * 1);
+	philo = new (sizeof(t_philo), 1);
 	if(!philo)
-		exit_philo("Error malloc");
+	{
+		destroy_stack();
+		exit(1);
+	}
 	philo->id = id;
 	philo->is_alive = 1;
 	philo->have_eat = 0;
 	philo->conf = conf;
+	philo->last_meal = 0;
+	philo->printer = printer;
 	philo->forks = (void *)stack->forks;
 	return (philo);
 }
