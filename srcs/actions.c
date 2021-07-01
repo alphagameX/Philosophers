@@ -1,4 +1,16 @@
-#include "source/philo.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   actions.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/07/02 01:18:24 by arthur            #+#    #+#             */
+/*   Updated: 2021/07/02 01:20:20 by arthur           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../source/philo.h"
 
 void mutex_printer(t_philo *philo, char const *str, long long int ms, int id)
 {
