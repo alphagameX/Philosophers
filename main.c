@@ -1,5 +1,34 @@
 #include "source/philo.h"
 
+void *god_philo(void *args)
+{
+	t_philo *philo;
+
+	philo = (t_philo *)args;
+	while(philo->is_alive && philo->conf->running)
+	{
+		// if (elapsed_time(philo->conf->elapsed) - philo->last_meal > philo->conf->time_to_die && philo->last_meal != 0)
+		// {
+		// 	philo->is_alive = 0;
+		// 	mutex_printer(philo, "died\n", elapsed_time(philo->conf->elapsed), philo->id);
+		// 	philo->conf->running = 0;
+		// }
+	}
+
+	return (NULL);
+}
+
+void create_god_philo(t_philo *philo)
+{
+	int err;
+	pthread_t god;
+
+	(void)god_philo;
+	err = pthread_create(&god, NULL, god_philo, (void *)philo);
+	if (err == -1)
+		philo->conf->running = 0;
+}
+
 void *philo_forum(void *args)
 {
 	t_philo *philo;
@@ -7,21 +36,23 @@ void *philo_forum(void *args)
 
 	philo = (t_philo *)args;
 	forks = (pthread_mutex_t *)philo->forks;
+	create_god_philo(philo);
 	while (philo->is_alive && philo->conf->running)
 	{
 		take_forks(philo, forks);
-		should_die(philo, forks);
 		eat(philo, forks);
 		if (philo->conf->number_of_times_each_philo_eat != -1 && philo->have_eat >= philo->conf->number_of_times_each_philo_eat)
 		{
-			printf("%6.0d %d died\n", elapsed_time_ms(philo->conf->elapsed), philo->id);
 			philo->is_alive = 0;
 			philo->conf->philo_dead++;
 		}
 		drop_forks(philo, forks);
-		mutex_printer(philo, "%6.0d %d is sleeping\n", elapsed_time_ms(philo->conf->elapsed), philo->id);
-		usleep(philo->conf->time_to_sleep);
-		mutex_printer(philo, "%6.0d %d is thinking\n", elapsed_time_ms(philo->conf->elapsed), philo->id);
+		if (philo->is_alive)
+		{
+			mutex_printer(philo, "is sleeping\n", elapsed_time(philo->conf->elapsed), philo->id);
+			sleep_time(philo->conf->time_to_sleep);
+			mutex_printer(philo, "is thinking\n", elapsed_time(philo->conf->elapsed), philo->id);
+		}
 	}
 	return (NULL);
 }
@@ -37,7 +68,6 @@ pthread_mutex_t *init_printer()
 	return (printer);
 }
 
-
 void create_philo(t_conf *conf, t_stack *stack)
 {
 	int i;
@@ -47,8 +77,8 @@ void create_philo(t_conf *conf, t_stack *stack)
 	err = 0;
 	i = 0;
 	printer = init_printer();
-	stack->tid = new(sizeof(pthread_t), conf->number_of_philo);
-	stack->philos = new(sizeof(t_philo *), conf->number_of_philo);
+	stack->tid = new (sizeof(pthread_t), conf->number_of_philo);
+	stack->philos = new (sizeof(t_philo *), conf->number_of_philo);
 	if (!stack->tid || !stack->philos)
 	{
 		destroy_stack();
@@ -63,7 +93,7 @@ void create_philo(t_conf *conf, t_stack *stack)
 			destroy_stack();
 			exit(1);
 		}
-		usleep(500);
+		sleep_time(100);
 		i++;
 	}
 	while (err < i)
@@ -72,8 +102,6 @@ void create_philo(t_conf *conf, t_stack *stack)
 		err++;
 	}
 }
-
-
 
 int main(int argc, char **argv)
 {
@@ -84,7 +112,7 @@ int main(int argc, char **argv)
 	stack.forks = init_forks(conf.number_of_philo);
 	create_philo(&conf, &stack);
 	if (conf.philo_dead == conf.number_of_philo)
-		printf("All philo eat\n");
+		printf("Each philo have eat %d times\n", conf.number_of_times_each_philo_eat);
 	destroy_stack();
 	return (0);
 }

@@ -29,11 +29,11 @@ t_conf init_conf(int argc, char **argv)
 				if (i == 1)
 					new.number_of_philo = res;
 				if (i == 2)
-					new.time_to_die = res * 1000;
+					new.time_to_die = res;
 				if (i == 3)
-					new.time_to_eat = res * 1000;
+					new.time_to_eat = res;
 				if (i == 4)
-					new.time_to_sleep = res * 1000;
+					new.time_to_sleep = res;
 				if (i == 5)
 					new.number_of_times_each_philo_eat = res;
 				else
