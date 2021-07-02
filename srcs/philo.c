@@ -6,7 +6,7 @@
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/02 14:24:51 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 14:42:19 by arthur           ###   ########.fr       */
+/*   Updated: 2021/07/02 15:12:58 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	*god_philo(void *args)
 			philo->conf->running = 0;
 			break ;
 		}
-		usleep(10);
+		usleep(100);
 	}
 	return (NULL);
 }
@@ -81,6 +81,7 @@ void	create_thread_philo(t_stack *stack, t_conf *conf,
 		destroy_stack();
 		exit(1);
 	}
+	sleep_time(100);
 }
 
 void	create_philo(t_conf *conf, t_stack *stack)
@@ -102,7 +103,6 @@ void	create_philo(t_conf *conf, t_stack *stack)
 	while (i < conf->number_of_philo)
 	{
 		create_thread_philo(stack, conf, printer, i);
-		usleep(10);
 		i++;
 	}
 	while (err < i)
