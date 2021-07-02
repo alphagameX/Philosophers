@@ -6,7 +6,7 @@
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/02 01:18:46 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 01:18:47 by arthur           ###   ########.fr       */
+/*   Updated: 2021/07/02 14:40:37 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 int	ft_isnumber(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
-	while(str[i])
+	while (str[i])
 	{
-		if(!ft_isdigit((int)str[i]) && str[i] != '-' && str[i] != '+')
+		if (!ft_isdigit((int)str[i]) && str[i] != '-' && str[i] != '+')
 			return (0);
 		i++;
 	}

@@ -1,28 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   norm.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/07/02 01:18:11 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 14:40:26 by arthur           ###   ########.fr       */
+/*   Created: 2021/07/02 14:33:20 by arthur            #+#    #+#             */
+/*   Updated: 2021/07/02 14:42:47 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "source/philo.h"
+#include "../source/philo.h"
 
-int	main(int argc, char **argv)
+pthread_mutex_t	*init_printer(void)
 {
-	t_conf	conf;
-	t_stack	stack;
+	pthread_mutex_t	*printer;
 
-	conf = init_conf(argc, argv);
-	stack.forks = init_forks(conf.number_of_philo);
-	create_philo(&conf, &stack);
-	if (conf.philo_dead == conf.number_of_philo)
-		printf("Each philo have eat %d times\n",
-			conf.number_of_times_each_philo_eat);
-	destroy_stack();
-	return (0);
+	printer = new (sizeof(pthread_mutex_t), 1);
+	if (!printer)
+	{
+		destroy_stack();
+		exit(1);
+	}
+	pthread_mutex_init(printer, NULL);
+	return (printer);
 }

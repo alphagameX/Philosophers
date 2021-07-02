@@ -6,13 +6,13 @@
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/02 01:18:43 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 01:18:44 by arthur           ###   ########.fr       */
+/*   Updated: 2021/07/02 14:41:47 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../source/philo.h"
 
-int ft_isdigit(int c)
+int	ft_isdigit(int c)
 {
 	if (c >= '0' && c <= '9')
 		return (1);
