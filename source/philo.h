@@ -6,7 +6,7 @@
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/02 01:18:20 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 14:39:19 by arthur           ###   ########.fr       */
+/*   Updated: 2021/07/14 17:36:30 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 # define PHILO_H
 # include <pthread.h>
 # include <unistd.h>
+# include <stdio.h>
 # include <sys/time.h>
-# include "../utils/mem/mem.h"
+# include "../utils/alloc/mem.h"
 
 typedef struct s_conf
 {
@@ -27,17 +28,23 @@ typedef struct s_conf
 	int				number_of_times_each_philo_eat;
 	struct timeval	elapsed;
 	int				philo_dead;
+	int				first_philo_ready;
+	pthread_mutex_t	*runner;
+	pthread_mutex_t	*deader;
 }	t_conf;
 
 typedef struct s_philo
 {
 	int				id;
+	int				single_ready;
 	int				is_alive;
 	int				have_eat;
 	long long int	last_meal;
 	t_conf			*conf;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*printer;
+	pthread_mutex_t	*eater;
+	pthread_mutex_t	*aliver;
 }	t_philo;
 
 typedef struct s_stack
@@ -47,6 +54,7 @@ typedef struct s_stack
 	t_philo			**philos;
 }	t_stack;
 
+void			*mutex_new(size_t size, size_t count);
 t_conf			init_conf(int argc, char **argv);
 pthread_mutex_t	*init_forks(int fork_count);
 void			create_philo(t_conf *conf, t_stack *stack);
@@ -60,12 +68,15 @@ long long int	elapsed_time(struct timeval start);
 struct timeval	now(void);
 void			sleep_time(int time);
 void			take_forks(t_philo *philo, pthread_mutex_t *forks);
+void			single_philo_fix(t_philo *philo);
 void			eat(t_philo *philo, pthread_mutex_t *forks);
+void			is_sated(t_philo *philo, pthread_mutex_t *forks);
 void			drop_forks(t_philo *philo, pthread_mutex_t *forks);
 void			sleep_and_think(t_philo *philo, pthread_mutex_t *forks);
 void			mutex_printer(t_philo *philo, char const *str,
 					long long int ms, int id);
 t_philo			**all_philos(t_philo **philos);
+void			kill_philo(t_philo *philo, int *alive);
 
 /*
 ** UTILS 

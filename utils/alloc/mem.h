@@ -5,29 +5,31 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/07/02 01:18:58 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 14:42:03 by arthur           ###   ########.fr       */
+/*   Created: 2021/07/09 15:35:34 by arthur            #+#    #+#             */
+/*   Updated: 2021/07/10 15:46:54 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MEM_H
 # define MEM_H
-# include <stdio.h>
 # include <stdlib.h>
 
 typedef struct s_mem_stack
 {
 	void				*ptr;
-	int					id;
 	struct s_mem_stack	*next;
+	struct s_mem_stack	*previous;
 }	t_mem_stack;
 
-typedef struct s_test {
+typedef struct s_test
+{
 	char	*str;
 	int		*tab;
 }	t_test;
 
-void	*new(size_t size, size_t count);
-void	destroy_stack(void);
+t_mem_stack	**mem_stack(void *ptr, int edit);
+void		*new(size_t size, size_t count);
+void		destroy_stack(void);
+void		ft_free(void *addr);
 
 #endif

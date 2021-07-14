@@ -6,7 +6,7 @@
 /*   By: arthur <arthur@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/02 01:18:28 by arthur            #+#    #+#             */
-/*   Updated: 2021/07/02 14:42:27 by arthur           ###   ########.fr       */
+/*   Updated: 2021/07/14 17:32:46 by arthur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	fill_conf(t_conf *conf, char **argv, int i)
 	if (ft_isnumber(argv[i]) == 1)
 	{
 		res = ft_atoi(argv[i]);
-		if (res >= 0)
+		if (res > 0)
 		{
 			if (i == 1)
 				conf->number_of_philo = res;
@@ -43,7 +43,7 @@ void	fill_conf(t_conf *conf, char **argv, int i)
 				conf->number_of_times_each_philo_eat = -1;
 		}
 		else
-			fail_parse("One parameter is negative");
+			fail_parse("One parameter is negative or egal zero");
 	}
 	else
 		fail_parse("One parameter is not a number");
@@ -51,7 +51,7 @@ void	fill_conf(t_conf *conf, char **argv, int i)
 
 t_conf	init_conf(int argc, char **argv)
 {
-	t_conf	new;
+	t_conf	n;
 	int		i;
 
 	if (argc < 5)
@@ -61,13 +61,17 @@ t_conf	init_conf(int argc, char **argv)
 	i = 1;
 	while (i < argc)
 	{
-		fill_conf(&new, argv, i);
+		fill_conf(&n, argv, i);
 		i++;
 	}
-	gettimeofday(&new.elapsed, NULL);
-	new.philo_dead = 0;
-	new.running = 1;
-	return (new);
+	n.first_philo_ready = 0;
+	n.philo_dead = 0;
+	n.running = 1;
+	n.runner = mutex_new(sizeof(pthread_mutex_t), 1);
+	pthread_mutex_init(n.runner, NULL);
+	n.deader = mutex_new(sizeof(pthread_mutex_t), 1);
+	pthread_mutex_init(n.deader, NULL);
+	return (n);
 }
 
 pthread_mutex_t	*init_forks(int fork_count)
@@ -75,7 +79,7 @@ pthread_mutex_t	*init_forks(int fork_count)
 	int					i;
 	pthread_mutex_t		*forks;
 
-	forks = new(sizeof(pthread_mutex_t), fork_count);
+	forks = mutex_new(sizeof(pthread_mutex_t), fork_count);
 	if (!forks)
 	{
 		destroy_stack();
@@ -95,7 +99,7 @@ t_philo	*init_philo(int id, t_stack *stack, t_conf *conf,
 {
 	t_philo	*philo;
 
-	philo = new (sizeof(t_philo), 1);
+	philo = mutex_new(sizeof(t_philo), 1);
 	if (!philo)
 	{
 		destroy_stack();
@@ -108,5 +112,13 @@ t_philo	*init_philo(int id, t_stack *stack, t_conf *conf,
 	philo->last_meal = 0;
 	philo->printer = printer;
 	philo->forks = (void *)stack->forks;
+	philo->eater = mutex_new(sizeof(pthread_mutex_t), 1);
+	pthread_mutex_init(philo->eater, NULL);
+	philo->aliver = mutex_new(sizeof(pthread_mutex_t), 1);
+	pthread_mutex_init(philo->aliver, NULL);
+	if (conf->number_of_philo > 1)
+		philo->single_ready = -1;
+	else
+		philo->single_ready = 0;
 	return (philo);
 }
